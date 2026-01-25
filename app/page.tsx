@@ -7,8 +7,13 @@ import { Sun } from "@/components/3d/Sun";
 import { EnhancedEarth } from "@/components/3d/EnhancedEarth";
 import { Planet } from "@/components/3d/Planet";
 import { AsteroidBelt } from "@/components/3d/AsteroidBelt";
-import { EffectComposer, Bloom } from "@react-three/postprocessing";
+import { EffectComposer, Bloom, GodRays } from "@react-three/postprocessing";
+import { BlendFunction, KernelSize } from "postprocessing";
 import { GameControls } from "@/components/3d/GameControls";
+import { NebulaSkybox } from "@/components/3d/NebulaSkybox";
+import { PlanetRadar } from "@/components/3d/PlanetRadar";
+import React, { useState } from "react";
+import * as THREE from "three";
 import { SpaceshipControls } from "@/components/3d/SpaceshipControls";
 import { HUD } from "@/components/ui/HUD";
 import { Navigation } from "@/components/ui/Navigation";
@@ -19,6 +24,7 @@ import { InteractiveGlobe } from "@/components/3d/InteractiveGlobe";
 
 export default function Home() {
   const { selectedPlanet } = useStore();
+  const [sunMesh, setSunMesh] = useState<THREE.Mesh | null>(null);
 
   if (selectedPlanet?.name === "Earth") {
     return <InteractiveGlobe />;
@@ -27,10 +33,11 @@ export default function Home() {
   return (
     <div className="w-full h-screen bg-black relative">
       <Canvas camera={{ position: [0, 10, 40], fov: 60 }} shadows>
-        <ambientLight intensity={0.2} />
-        <Stars radius={300} depth={50} count={10000} factor={4} saturation={1} fade speed={0.5} />
+        <ambientLight intensity={0.1} />
+        <NebulaSkybox />
+        <Stars radius={300} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
         
-        <Sun />
+        <Sun ref={setSunMesh} />
         <EnhancedEarth />
         <AsteroidBelt />
 
@@ -39,11 +46,26 @@ export default function Home() {
         ))}
 
         <EffectComposer>
-          <Bloom luminanceThreshold={1} mipmapBlur intensity={1.5} radius={0.6} />
+          <Bloom luminanceThreshold={0.2} mipmapBlur intensity={1.5} radius={0.6} />
+          {(sunMesh && (
+            <GodRays
+              sun={sunMesh}
+              blendFunction={BlendFunction.SCREEN} 
+              samples={60} 
+              density={0.96} 
+              decay={0.9} 
+              weight={0.3} 
+              exposure={0.6} 
+              clampMax={1} 
+              kernelSize={KernelSize.SMALL} 
+              blur={true} 
+            />
+          )) as unknown as React.ReactElement}
         </EffectComposer>
 
         <GameControls />
         <SpaceshipControls />
+        <PlanetRadar />
       </Canvas>
       
       <HUD />

@@ -6,6 +6,7 @@ import { Html } from "@react-three/drei";
 import * as THREE from "three";
 import { useStore } from "@/lib/store";
 import { planets } from "@/lib/data/planets";
+import { PlanetLabel } from "./PlanetLabel";
 
 export function EnhancedEarth() {
   const orbitRef = useRef<THREE.Group>(null!);
@@ -114,15 +115,7 @@ export function EnhancedEarth() {
             <meshStandardMaterial map={moonTexture} />
           </mesh>
 
-          {/* Label */}
-          {hovered && (
-            <Html distanceFactor={25}>
-              <div className="bg-black/80 text-white px-3 py-2 rounded-lg text-sm select-none pointer-events-none whitespace-nowrap border border-cyan-400/50 shadow-lg">
-                <div className="font-bold text-cyan-400">🌍 Earth</div>
-                <div className="text-xs text-gray-300">The Blue Marble</div>
-              </div>
-            </Html>
-          )}
+          <PlanetLabel planet={earthData} visible={hovered} />
         </group>
       </group>
     </group>

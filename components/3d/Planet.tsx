@@ -6,6 +6,7 @@ import { Html } from "@react-three/drei";
 import * as THREE from "three";
 import { PlanetData } from "@/lib/data/planets";
 import { useStore } from "@/lib/store";
+import { PlanetLabel } from "./PlanetLabel";
 
 interface PlanetProps {
   planet: PlanetData;
@@ -58,14 +59,7 @@ export function Planet({ planet }: PlanetProps) {
             />
           </mesh>
 
-          {/* Label */}
-          {hovered && (
-             <Html distanceFactor={25}>
-               <div className="bg-black/80 text-white px-2 py-1 rounded text-xs select-none pointer-events-none whitespace-nowrap border border-white/20">
-                 {planet.name}
-               </div>
-             </Html>
-          )}
+          <PlanetLabel planet={planet} visible={hovered} />
 
           {/* Moon (if added) */}
           {planet.moon && moonTexture && (

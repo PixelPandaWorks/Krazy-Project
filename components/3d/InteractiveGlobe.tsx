@@ -16,8 +16,6 @@ export function InteractiveGlobe() {
   const [mounted, setMounted] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
-  const [markers, setMarkers] = useState<any[]>([]);
-  const [rings, setRings] = useState<any[]>([]);
 
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -73,21 +71,18 @@ export function InteractiveGlobe() {
     setSuggestions([]);
     setShowSuggestions(false);
 
-    // Fly to location with DEEP zoom
+    // 1. Zoom out first to show the whole Earth
     if (globeEl.current) {
         globeEl.current.controls().autoRotate = false;
-        // 0.015 altitude is very close (approx max zoom before clipping)
-        globeEl.current.pointOfView({ lat, lng, altitude: 0.015 }, 2500);
+        globeEl.current.pointOfView({ altitude: 2.5 }, 1200);
+
+        // 2. Then fly to location with EXTREME zoom
+        setTimeout(() => {
+          if (globeEl.current) {
+            globeEl.current.pointOfView({ lat, lng, altitude: 0.001 }, 3200);
+          }
+        }, 1200);
     }
-
-    // Truncate overly long names
-    const shortName = placeName.length > 40 ? placeName.substring(0, 40) + "..." : placeName;
-    
-    // Set Marker (Text + Dot)
-    setMarkers([{ lat, lng, name: shortName, size: 10, color: "white" }]);
-
-    // Set Red Highlight Ring
-    setRings([{ lat, lng }]);
   };
 
   const handleSearch = (e: React.FormEvent) => {
@@ -164,26 +159,6 @@ export function InteractiveGlobe() {
                  if (l < 2) return null; // Use base texture for low zoom to save API calls
                  return `https://api.maptiler.com/maps/satellite/${l}/${x}/${y}.jpg?key=${MAPTILER_KEY}`;
               }}
-              
-              // Search Markers (Label + Dot)
-              labelsData={markers}
-              labelLat={(d: any) => d.lat}
-              labelLng={(d: any) => d.lng}
-              labelText={(d: any) => d.name}
-              labelSize={0.1} // Small text
-              labelDotRadius={0.04} // Small dot
-              labelColor={() => "white"}
-              labelResolution={3}
-              labelAltitude={0.001} // Slightly raised
-
-              // Red Highlight Rings
-              ringsData={rings}
-              ringLat={(d: any) => d.lat}
-              ringLng={(d: any) => d.lng}
-              ringColor={() => "#ff0000"} // Red border
-              ringMaxRadius={2} // Size of the ring (in degrees)
-              ringPropagationSpeed={2} // Pulse speed
-              ringRepeatPeriod={800} // Pulse frequency
 
               atmosphereColor="lightskyblue"
               atmosphereAltitude={0.15}
