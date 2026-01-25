@@ -10,7 +10,6 @@ import { AsteroidBelt } from "@/components/3d/AsteroidBelt";
 import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import { GameControls } from "@/components/3d/GameControls";
 import { SpaceshipControls } from "@/components/3d/SpaceshipControls";
-import { Title } from "@/components/3d/Title";
 import { HUD } from "@/components/ui/HUD";
 import { Navigation } from "@/components/ui/Navigation";
 import { ModeToggle } from "@/components/ui/ModeToggle";
@@ -31,7 +30,6 @@ export default function Home() {
         <ambientLight intensity={0.2} />
         <Stars radius={300} depth={50} count={10000} factor={4} saturation={1} fade speed={0.5} />
         
-        <Title />
         <Sun />
         <EnhancedEarth />
         <AsteroidBelt />
