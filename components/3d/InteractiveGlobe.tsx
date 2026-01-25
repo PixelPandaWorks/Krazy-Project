@@ -12,7 +12,7 @@ const Globe = dynamic(() => import("react-globe.gl"), { ssr: false });
 export function InteractiveGlobe() {
   const { setSelectedPlanet } = useStore();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const globeEl = useRef<any>();
+  const globeEl = useRef<any>(null);
   const [mounted, setMounted] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
