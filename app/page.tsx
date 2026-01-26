@@ -6,6 +6,7 @@ import { planets } from "@/lib/data/planets";
 import { Sun } from "@/components/3d/Sun";
 import { EnhancedEarth } from "@/components/3d/EnhancedEarth";
 import { Planet } from "@/components/3d/Planet";
+import { Constellations } from "@/components/3d/Constellations";
 import { AsteroidBelt } from "@/components/3d/AsteroidBelt";
 import { EffectComposer, Bloom, GodRays } from "@react-three/postprocessing";
 import { BlendFunction, KernelSize } from "postprocessing";
@@ -43,6 +44,7 @@ export default function Home() {
         
         <Sun ref={setSunMesh} />
         <EnhancedEarth />
+        <Constellations />
         <AsteroidBelt />
 
         {planets.filter(p => p.name !== "Earth").map((planet, index) => (

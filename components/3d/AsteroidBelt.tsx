@@ -2,12 +2,17 @@
 
 import { useRef, useMemo, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
+import { useTexture } from "@react-three/drei";
 import * as THREE from "three";
 
 export function AsteroidBelt() {
   const meshRef = useRef<THREE.InstancedMesh>(null!);
   const count = 2000;
   const dummy = useMemo(() => new THREE.Object3D(), []);
+  
+  // Load asteroid texture
+  const asteroidTexture = useTexture("/asteroid.jpg");
+  asteroidTexture.wrapS = asteroidTexture.wrapT = THREE.RepeatWrapping;
 
   // Generate random asteroid data once
   const asteroids = useMemo(() => {
@@ -50,7 +55,13 @@ export function AsteroidBelt() {
   return (
     <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
       <dodecahedronGeometry args={[0.2, 0]} />
-      <meshStandardMaterial color="#666666" roughness={0.8} />
+      <meshStandardMaterial 
+        map={asteroidTexture}
+        roughness={0.9} 
+        metalness={0.1}
+        bumpMap={asteroidTexture}
+        bumpScale={0.05}
+      />
     </instancedMesh>
   );
 }

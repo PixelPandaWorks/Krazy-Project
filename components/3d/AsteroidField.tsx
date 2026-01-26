@@ -4,7 +4,7 @@ import { useFrame } from "@react-three/fiber";
 import { useRef, useState, useEffect } from "react";
 import * as THREE from "three";
 import { useStore } from "@/lib/store";
-import { Html } from "@react-three/drei";
+import { Html, useTexture } from "@react-three/drei";
 
 interface NEO {
   id: string;
@@ -22,6 +22,10 @@ export function AsteroidField() {
   const [asteroids, setAsteroids] = useState<NEO[]>([]);
   const meshRefs = useRef<{[key: string]: THREE.Mesh}>({});
   const groupRef = useRef<THREE.Group>(null!);
+  
+  // Load asteroid texture
+  const asteroidTexture = useTexture("/asteroid.jpg");
+  asteroidTexture.wrapS = asteroidTexture.wrapT = THREE.RepeatWrapping;
 
   // Fetch NASA Data
   useEffect(() => {
@@ -115,11 +119,12 @@ export function AsteroidField() {
                 {/* Dodecahedron looks rocky */}
                 <dodecahedronGeometry args={[Math.max(0.5, asteroid.diameter_max / 100), 0]} /> 
                 <meshStandardMaterial 
-                    color="#888888" 
+                    map={asteroidTexture}
                     roughness={0.9} 
                     metalness={0.1} 
                     flatShading 
-                    bumpScale={1}
+                    bumpMap={asteroidTexture}
+                    bumpScale={0.1}
                 />
             </mesh>
             
