@@ -1,7 +1,7 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { useFrame, useLoader } from "@react-three/fiber";
+import { useRef, useState, useEffect } from "react";
+import { useFrame, useLoader, useThree } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import * as THREE from "three";
 import { PlanetData } from "@/lib/data/planets";
@@ -16,11 +16,27 @@ export function Planet({ planet }: PlanetProps) {
   const ref = useRef<THREE.Group>(null!);
   const [hovered, setHover] = useState(false);
   const { setSelectedPlanet } = useStore();
+  const { gl } = useThree();
   
   // Load texture if available
   const texture = useLoader(THREE.TextureLoader, planet.texture);
   const ringTexture = planet.ring ? useLoader(THREE.TextureLoader, planet.ring) : null;
   const moonTexture = planet.moon ? useLoader(THREE.TextureLoader, "/moon.jpg") : null;
+
+  useEffect(() => {
+    if (texture) {
+      texture.anisotropy = gl.capabilities.getMaxAnisotropy();
+      texture.minFilter = THREE.LinearMipmapLinearFilter;
+      texture.magFilter = THREE.LinearFilter;
+      texture.generateMipmaps = true;
+    }
+    if (ringTexture) {
+      ringTexture.anisotropy = gl.capabilities.getMaxAnisotropy();
+    }
+    if (moonTexture) {
+      moonTexture.anisotropy = gl.capabilities.getMaxAnisotropy();
+    }
+  }, [texture, ringTexture, moonTexture, gl]);
 
   useFrame((state) => {
     if (ref.current) {
@@ -37,7 +53,7 @@ export function Planet({ planet }: PlanetProps) {
     <group>
       {/* Orbit Path */}
       <mesh rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[planet.distance - 0.1, planet.distance + 0.1, 128]} />
+        <ringGeometry args={[planet.distance - 0.1, planet.distance + 0.1, 256]} />
         <meshBasicMaterial color="#ffffff" opacity={0.05} transparent side={THREE.DoubleSide} />
       </mesh>
 
@@ -56,10 +72,14 @@ export function Planet({ planet }: PlanetProps) {
             castShadow
             receiveShadow
           >
+            {/* Ultra High Resolution Geometry */}
             <sphereGeometry args={[planet.size, 128, 128]} />
             <meshStandardMaterial 
               map={texture} 
-              color={hovered ? "#ffaaaa" : (planet.color || "#ffffff")} 
+              color={hovered ? "#ffcece" : (planet.color || "#ffffff")} 
+              roughness={planet.roughness ?? 0.5}
+              metalness={planet.metalness ?? 0.0}
+              envMapIntensity={0.8}
             />
           </mesh>
 
@@ -67,17 +87,28 @@ export function Planet({ planet }: PlanetProps) {
 
           {/* Moon (if added) */}
           {planet.moon && moonTexture && (
-            <mesh position={[1.5, 0, 0]}>
-              <sphereGeometry args={[0.2, 32, 32]} />
-              <meshStandardMaterial map={moonTexture} />
+            <mesh position={[planet.size + 1.5, 0, 0]} castShadow receiveShadow>
+              <sphereGeometry args={[0.2, 64, 64]} />
+              <meshStandardMaterial 
+                map={moonTexture} 
+                roughness={0.8} 
+                metalness={0.0} 
+              />
             </mesh>
           )}
 
           {/* Saturn Ring */}
           {planet.ring && ringTexture && (
-            <mesh rotation={[-Math.PI / 2.5, 0, 0]}>
-              <ringGeometry args={[planet.size + 0.5, planet.size + 2.0, 64]} />
-              <meshBasicMaterial map={ringTexture} side={THREE.DoubleSide} transparent opacity={0.8} />
+            <mesh rotation={[-Math.PI / 2.5, 0, 0]} receiveShadow>
+              <ringGeometry args={[planet.size + 0.5, planet.size + 2.5, 128]} />
+              <meshStandardMaterial 
+                map={ringTexture} 
+                side={THREE.DoubleSide} 
+                transparent 
+                opacity={0.9} 
+                roughness={0.4}
+                metalness={0.1}
+              />
             </mesh>
           )}
         </group>

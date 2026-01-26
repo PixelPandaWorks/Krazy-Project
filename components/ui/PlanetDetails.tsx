@@ -35,12 +35,23 @@ export function PlanetDetails() {
     e?.preventDefault();
     if (!input.trim() || isLoading) return;
 
+    const requestStartTime = Date.now();
+    const requestId = Math.random().toString(36).substring(7);
+    
+    console.log("\n" + "━".repeat(50));
+    console.log(`[Planet Chat] 🚀 Request #${requestId} started`);
+    console.log(`[Planet Chat] 📍 Planet: ${selectedPlanet.name}`);
+    console.log(`[Planet Chat] 💬 Message: "${input}"`);
+    console.log(`[Planet Chat] 📊 Conversation length: ${messages.length + 1} messages`);
+
     const userMsg: Message = { role: "user", content: input };
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setIsLoading(true);
 
     try {
+        console.log(`[Planet Chat] 📤 Sending to /api/chat...`);
+        
         const res = await fetch("/api/chat", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -50,16 +61,31 @@ export function PlanetDetails() {
             }),
         });
 
+        const elapsed = Date.now() - requestStartTime;
+        console.log(`[Planet Chat] 📥 Response received in ${elapsed}ms`);
+        console.log(`[Planet Chat] 📊 Status: ${res.status} ${res.statusText}`);
+
         const data = await res.json();
+        console.log(`[Planet Chat] 📦 Response data:`, data);
         
         if (data.error) {
+            console.error(`[Planet Chat] ❌ API returned error: ${data.error}`);
             setMessages((prev) => [...prev, { role: "assistant", content: "⚠️ System malfunction: " + data.error }]);
         } else {
+            console.log(`[Planet Chat] ✅ Success! AI response: "${data.content?.substring(0, 50)}..."`);
             setMessages((prev) => [...prev, data]);
         }
-    } catch {
-        setMessages((prev) => [...prev, { role: "assistant", content: "⚠️ Connection lost to AI core." }]);
+    } catch (error: any) {
+        const elapsed = Date.now() - requestStartTime;
+        console.error(`[Planet Chat] 🔥 Network/Fetch error after ${elapsed}ms`);
+        console.error(`[Planet Chat] Error type:`, error?.constructor?.name);
+        console.error(`[Planet Chat] Error message:`, error?.message);
+        console.error(`[Planet Chat] Full error:`, error);
+        setMessages((prev) => [...prev, { role: "assistant", content: "⚠️ Connection lost to AI core. Check console for details." }]);
     } finally {
+        const totalElapsed = Date.now() - requestStartTime;
+        console.log(`[Planet Chat] ⏱️ Total time: ${totalElapsed}ms`);
+        console.log("━".repeat(50) + "\n");
         setIsLoading(false);
     }
   };

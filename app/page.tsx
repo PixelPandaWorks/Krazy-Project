@@ -10,7 +10,6 @@ import { AsteroidBelt } from "@/components/3d/AsteroidBelt";
 import { EffectComposer, Bloom, GodRays } from "@react-three/postprocessing";
 import { BlendFunction, KernelSize } from "postprocessing";
 import { GameControls } from "@/components/3d/GameControls";
-import { PlanetRadar } from "@/components/3d/PlanetRadar";
 import { DefenseHUD } from "@/components/ui/DefenseHUD";
 import { AsteroidField } from "@/components/3d/AsteroidField";
 import React, { useState } from "react";
@@ -37,7 +36,7 @@ export default function Home() {
   return (
     <div className="w-full h-screen bg-black relative">
       <Canvas camera={{ position: [0, 10, 40], fov: 60 }} shadows>
-        <ambientLight intensity={0.1} />
+        <ambientLight intensity={0.3} />
         <Stars radius={300} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
         
         <PlanetFocus />
@@ -50,8 +49,8 @@ export default function Home() {
           <Planet key={index} planet={planet} />
         ))}
 
-        <EffectComposer>
-          <Bloom luminanceThreshold={0.2} mipmapBlur intensity={1.5} radius={0.6} />
+        <EffectComposer enableNormalPass={false}>
+          <Bloom luminanceThreshold={1} mipmapBlur intensity={0.6} radius={0.6} />
           {(sunMesh && (
             <GodRays
               sun={sunMesh}
@@ -60,7 +59,7 @@ export default function Home() {
               density={0.96} 
               decay={0.9} 
               weight={0.3} 
-              exposure={0.6} 
+              exposure={0.2} 
               clampMax={1} 
               kernelSize={KernelSize.SMALL} 
               blur={true} 
@@ -70,7 +69,6 @@ export default function Home() {
 
         <GameControls />
         <SpaceshipControls />
-        <PlanetRadar />
         <AsteroidField />
       </Canvas>
       
