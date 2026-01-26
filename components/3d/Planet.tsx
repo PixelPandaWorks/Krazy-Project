@@ -46,13 +46,17 @@ export function Planet({ planet }: PlanetProps) {
         {/* Actual Planet Mesh */}
         <group position={[planet.distance, 0, 0]}>
           <mesh 
+            name={`planet-${planet.name}`}
             onPointerOver={() => { document.body.style.cursor = 'pointer'; setHover(true); }} 
             onPointerOut={() => { document.body.style.cursor = 'auto'; setHover(false); }}
-            onClick={() => setSelectedPlanet(planet)}
+            onClick={(e) => {
+              e.stopPropagation(); // Prevent click from passing through
+              setSelectedPlanet(planet);
+            }}
             castShadow
             receiveShadow
           >
-            <sphereGeometry args={[planet.size, 64, 64]} />
+            <sphereGeometry args={[planet.size, 128, 128]} />
             <meshStandardMaterial 
               map={texture} 
               color={hovered ? "#ffaaaa" : (planet.color || "#ffffff")} 

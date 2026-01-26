@@ -10,8 +10,9 @@ import { AsteroidBelt } from "@/components/3d/AsteroidBelt";
 import { EffectComposer, Bloom, GodRays } from "@react-three/postprocessing";
 import { BlendFunction, KernelSize } from "postprocessing";
 import { GameControls } from "@/components/3d/GameControls";
-import { NebulaSkybox } from "@/components/3d/NebulaSkybox";
 import { PlanetRadar } from "@/components/3d/PlanetRadar";
+import { DefenseHUD } from "@/components/ui/DefenseHUD";
+import { AsteroidField } from "@/components/3d/AsteroidField";
 import React, { useState } from "react";
 import * as THREE from "three";
 import { SpaceshipControls } from "@/components/3d/SpaceshipControls";
@@ -21,6 +22,9 @@ import { ModeToggle } from "@/components/ui/ModeToggle";
 import { AudioSystem } from "@/components/systems/AudioSystem";
 import { useStore } from "@/lib/store";
 import { InteractiveGlobe } from "@/components/3d/InteractiveGlobe";
+
+import { PlanetFocus } from "@/components/3d/PlanetFocus";
+import { PlanetDetails } from "@/components/ui/PlanetDetails";
 
 export default function Home() {
   const { selectedPlanet } = useStore();
@@ -34,8 +38,9 @@ export default function Home() {
     <div className="w-full h-screen bg-black relative">
       <Canvas camera={{ position: [0, 10, 40], fov: 60 }} shadows>
         <ambientLight intensity={0.1} />
-        <NebulaSkybox />
         <Stars radius={300} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
+        
+        <PlanetFocus />
         
         <Sun ref={setSunMesh} />
         <EnhancedEarth />
@@ -66,9 +71,12 @@ export default function Home() {
         <GameControls />
         <SpaceshipControls />
         <PlanetRadar />
+        <AsteroidField />
       </Canvas>
       
       <HUD />
+      <DefenseHUD />
+      <PlanetDetails />
       <Navigation />
       <ModeToggle />
       <AudioSystem />

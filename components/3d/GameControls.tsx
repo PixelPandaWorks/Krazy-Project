@@ -4,9 +4,13 @@ import { OrbitControls } from "@react-three/drei";
 import { useStore } from "@/lib/store";
 
 export function GameControls() {
-  const { isSpaceshipMode } = useStore();
+  const { isSpaceshipMode, selectedPlanet } = useStore();
 
-  if (isSpaceshipMode) return null;
-
-  return <OrbitControls enablePan={false} maxDistance={150} minDistance={10} />;
+  return <OrbitControls 
+    makeDefault
+    enabled={!isSpaceshipMode}
+    enablePan={false} 
+    maxDistance={150} 
+    minDistance={10} 
+  />;
 }
