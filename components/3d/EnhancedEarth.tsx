@@ -59,6 +59,8 @@ export function EnhancedEarth() {
           {/* Main Earth - Day side with emissive night lights */}
           <mesh 
             ref={earthRef}
+            name="planet-Earth"
+            userData={{ planet: earthData }}
             onPointerOver={() => { document.body.style.cursor = 'pointer'; setHover(true); }} 
             onPointerOut={() => { document.body.style.cursor = 'auto'; setHover(false); }}
             onClick={() => setSelectedPlanet(earthData)}

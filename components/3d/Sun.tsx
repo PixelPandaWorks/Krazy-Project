@@ -8,7 +8,7 @@ export const Sun = React.forwardRef<THREE.Mesh>((props, ref) => {
   const texture = useLoader(THREE.TextureLoader, "/sun.jpg");
   
   return (
-    <mesh ref={ref} {...props}>
+    <mesh ref={ref} {...props} name="Sun">
       <sphereGeometry args={[4, 128, 128]} />
       <meshStandardMaterial 
         map={texture} 

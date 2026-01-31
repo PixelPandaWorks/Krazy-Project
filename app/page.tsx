@@ -25,6 +25,8 @@ import { InteractiveGlobe } from "@/components/3d/InteractiveGlobe";
 
 import { PlanetFocus } from "@/components/3d/PlanetFocus";
 import { PlanetDetails } from "@/components/ui/PlanetDetails";
+import { SpaceshipInteraction } from "@/components/3d/SpaceshipInteraction";
+import { Crosshair } from "@/components/ui/Crosshair";
 
 export default function Home() {
   const { selectedPlanet } = useStore();
@@ -71,9 +73,11 @@ export default function Home() {
 
         <GameControls />
         <SpaceshipControls />
+        <SpaceshipInteraction />
         <AsteroidField />
       </Canvas>
       
+      <Crosshair />
       <HUD />
       <DefenseHUD />
       <PlanetDetails />

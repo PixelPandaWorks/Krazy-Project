@@ -4,10 +4,15 @@
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { useStore } from "@/lib/store";
-import { ArrowLeft, Layers, Search } from "lucide-react";
+import { ArrowLeft, Layers, Search, Send, Sparkles, Bot } from "lucide-react";
 
 // Dynamically import Globe with no SSR
 const Globe = dynamic(() => import("react-globe.gl"), { ssr: false });
+
+interface Message {
+  role: "user" | "assistant";
+  content: string;
+}
 
 export function InteractiveGlobe() {
   const { setSelectedPlanet } = useStore();
@@ -19,6 +24,12 @@ export function InteractiveGlobe() {
 
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+
+  // Chat state
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [chatInput, setChatInput] = useState("");
+  const [isChatLoading, setIsChatLoading] = useState(false);
+  const chatScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -32,6 +43,13 @@ export function InteractiveGlobe() {
         globeEl.current.pointOfView({ altitude: 2 }, 2000);
     }
   }, [mounted]);
+
+  // Auto-scroll chat to bottom
+  useEffect(() => {
+    if (chatScrollRef.current) {
+      chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   const MAPTILER_KEY = process.env.NEXT_PUBLIC_MAPTILER_API_KEY || "";
 
@@ -89,6 +107,40 @@ export function InteractiveGlobe() {
     e.preventDefault();
     if (suggestions.length > 0) {
         selectLocation(suggestions[0]);
+    }
+  };
+
+  // Chat handler
+  const handleChatSend = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!chatInput.trim() || isChatLoading) return;
+
+    const userMsg: Message = { role: "user", content: chatInput };
+    setMessages((prev) => [...prev, userMsg]);
+    setChatInput("");
+    setIsChatLoading(true);
+
+    try {
+        const res = await fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                planetName: "Earth",
+                messages: [...messages, userMsg],
+            }),
+        });
+
+        const data = await res.json();
+        
+        if (data.error) {
+            setMessages((prev) => [...prev, { role: "assistant", content: "⚠️ System malfunction: " + data.error }]);
+        } else {
+            setMessages((prev) => [...prev, data]);
+        }
+    } catch (error: any) {
+        setMessages((prev) => [...prev, { role: "assistant", content: "⚠️ Connection lost to AI core." }]);
+    } finally {
+        setIsChatLoading(false);
     }
   };
 
@@ -182,6 +234,82 @@ export function InteractiveGlobe() {
                 Interactive Mode
             </h3>
             <p>Drag to rotate. Scroll to zoom. High-resolution satellite imagery.</p>
+        </div>
+      </div>
+
+      {/* AI Chat Panel - Bottom Right */}
+      <div className="absolute bottom-6 right-6 z-50 pointer-events-auto w-full max-w-sm">
+        <div className="bg-black/80 backdrop-blur-xl border border-white/20 rounded-2xl overflow-hidden shadow-2xl flex flex-col h-[400px]">
+          {/* Decoration */}
+          <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-green-500 via-cyan-500 to-blue-500" />
+          
+          {/* Chat Header */}
+          <div className="p-4 border-b border-white/10 bg-white/5 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-cyan-600 flex items-center justify-center shadow-lg animate-pulse-slow">
+                       <Bot className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                       <h2 className="text-white font-bold tracking-tight">Earth AI</h2>
+                       <p className="text-green-400 text-xs font-mono tracking-wider">ONLINE // ASK ME ANYTHING</p>
+                  </div>
+              </div>
+              <div className="text-right hidden sm:block">
+                   <p className="text-white/60 text-xs uppercase font-mono">Avg Temp</p>
+                   <p className="text-white font-bold text-sm">15°C</p>
+              </div>
+          </div>
+          
+          {/* Messages Area */}
+          <div ref={chatScrollRef} className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+               {messages.length === 0 && (
+                   <div className="text-center text-white/40 mt-10 space-y-2">
+                       <Sparkles className="w-8 h-8 mx-auto opacity-50 mb-2" />
+                       <p>Ask about Earth's geography, climate, or ecosystems.</p>
+                       <p className="text-xs">Examples: "What's the tallest mountain?" "Why is the sky blue?"</p>
+                   </div>
+               )}
+               
+               {messages.map((msg, i) => (
+                   <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                       <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+                           msg.role === 'user' 
+                           ? 'bg-cyan-600 text-white rounded-tr-none' 
+                           : 'bg-white/10 text-white/90 rounded-tl-none border border-white/5'
+                       }`}>
+                           {msg.content}
+                       </div>
+                   </div>
+               ))}
+               
+               {isChatLoading && (
+                   <div className="flex justify-start">
+                       <div className="bg-white/10 text-white/50 rounded-2xl rounded-tl-none px-4 py-3 text-xs animate-pulse">
+                           Analyzing Earth data...
+                       </div>
+                   </div>
+               )}
+          </div>
+
+          {/* Input Area */}
+          <form onSubmit={handleChatSend} className="p-4 border-t border-white/10 bg-black/40">
+              <div className="relative flex items-center gap-2">
+                  <input
+                      type="text"
+                      value={chatInput}
+                      onChange={(e) => setChatInput(e.target.value)}
+                      placeholder="Ask about Earth..."
+                      className="flex-1 bg-white/5 border border-white/10 focus:border-cyan-400 rounded-full pl-4 pr-12 py-3 text-white placeholder-white/30 focus:outline-none transition-all font-sans text-sm"
+                  />
+                  <button 
+                    type="submit"
+                    disabled={!chatInput.trim() || isChatLoading}
+                    className="absolute right-1 top-1 p-2 bg-gradient-to-r from-green-500 to-cyan-500 rounded-full text-white shadow-lg hover:scale-105 active:scale-95 disabled:opacity-50 disabled:scale-100 transition-all"
+                  >
+                      <Send className="w-4 h-4" />
+                  </button>
+              </div>
+          </form>
         </div>
       </div>
     </div>

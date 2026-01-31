@@ -66,6 +66,7 @@ export function Constellations({ radius = 900 }: ConstellationsProps) {
                 
                 {/* Hit Box (Invisible Sphere for interaction) */}
                 <mesh 
+                  name={`constellation-${constellation.name}`}
                   onPointerOver={(e) => handlePointerOver(e, constellation.name)} 
                   onPointerOut={handlePointerOut}
                 >

@@ -63,6 +63,7 @@ export function Planet({ planet }: PlanetProps) {
         <group position={[planet.distance, 0, 0]}>
           <mesh 
             name={`planet-${planet.name}`}
+            userData={{ planet }}
             onPointerOver={() => { document.body.style.cursor = 'pointer'; setHover(true); }} 
             onPointerOut={() => { document.body.style.cursor = 'auto'; setHover(false); }}
             onClick={(e) => {
