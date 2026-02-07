@@ -12,6 +12,7 @@ export function EnhancedEarth() {
   const orbitRef = useRef<THREE.Group>(null!);
   const earthRef = useRef<THREE.Mesh>(null!);
   const cloudsRef = useRef<THREE.Mesh>(null!);
+  const moonOrbitRef = useRef<THREE.Group>(null!);
   const [hovered, setHover] = useState(false);
   const { setSelectedPlanet } = useStore();
 
@@ -30,16 +31,17 @@ export function EnhancedEarth() {
 
   useFrame((state) => {
     if (orbitRef.current) {
-      // Orbital rotation
       orbitRef.current.rotation.y = state.clock.getElapsedTime() * speed * 0.1;
     }
     if (earthRef.current) {
-      // Axial rotation (Earth day)
       earthRef.current.rotation.y += 0.002;
     }
     if (cloudsRef.current) {
-      // Clouds rotate slightly faster than Earth
       cloudsRef.current.rotation.y += 0.0025;
+    }
+    if (moonOrbitRef.current) {
+      // Moon revolves around Earth
+      moonOrbitRef.current.rotation.y += 0.005; 
     }
   });
 
@@ -111,11 +113,13 @@ export function EnhancedEarth() {
             />
           </mesh>
 
-          {/* Moon */}
-          <mesh position={[1.5, 0, 0]} castShadow receiveShadow>
-            <sphereGeometry args={[0.2, 32, 32]} />
-            <meshStandardMaterial map={moonTexture} />
-          </mesh>
+          {/* Moon Orbit Group */}
+          <group ref={moonOrbitRef}>
+            <mesh position={[1.5, 0, 0]} castShadow receiveShadow>
+              <sphereGeometry args={[0.2, 32, 32]} />
+              <meshStandardMaterial map={moonTexture} />
+            </mesh>
+          </group>
 
           <PlanetLabel planet={earthData} visible={hovered} />
         </group>

@@ -4,6 +4,7 @@ import { Canvas } from "@react-three/fiber";
 import { Stars } from "@react-three/drei";
 import { planets } from "@/lib/data/planets";
 import { Sun } from "@/components/3d/Sun";
+import { Comet } from "@/components/3d/Comet";
 import { EnhancedEarth } from "@/components/3d/EnhancedEarth";
 import { Planet } from "@/components/3d/Planet";
 import { Constellations } from "@/components/3d/Constellations";
@@ -48,6 +49,7 @@ export default function Home() {
         <EnhancedEarth />
         <Constellations />
         <AsteroidBelt />
+        <Comet />
 
         {planets.filter(p => p.name !== "Earth").map((planet, index) => (
           <Planet key={index} planet={planet} />
