@@ -28,6 +28,7 @@ import { PlanetFocus } from "@/components/3d/PlanetFocus";
 import { PlanetDetails } from "@/components/ui/PlanetDetails";
 import { SpaceshipInteraction } from "@/components/3d/SpaceshipInteraction";
 import { Crosshair } from "@/components/ui/Crosshair";
+import { LoadingScreen } from "@/components/ui/LoadingScreen";
 
 export default function Home() {
   const { selectedPlanet } = useStore();
@@ -39,6 +40,7 @@ export default function Home() {
 
   return (
     <div className="w-full h-screen bg-black relative">
+      <LoadingScreen />
       <Canvas camera={{ position: [0, 10, 40], fov: 60 }} shadows>
         <ambientLight intensity={0.3} />
         <Stars radius={300} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
