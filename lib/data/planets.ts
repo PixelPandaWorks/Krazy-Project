@@ -91,8 +91,8 @@ export const planets: PlanetData[] = [
     size: 1.5, 
     distance: 55, 
     speed: 0.3, 
-    texture: "/uranus.jpg", 
-    roughness: 0.3,
+    texture: "/uranus_custom.png", 
+    roughness: 0.1,
     metalness: 0.1,
     description: "An ice giant. It rotates at a nearly 90-degree angle from the plane of its orbit.",
     stats: { temp: "-195°C", gravity: "8.69 m/s²", day: "17h 14m", year: "84y" }

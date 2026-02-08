@@ -4,7 +4,7 @@ import { Canvas } from "@react-three/fiber";
 import { Stars } from "@react-three/drei";
 import { planets } from "@/lib/data/planets";
 import { Sun } from "@/components/3d/Sun";
-import { Comet } from "@/components/3d/Comet";
+
 import { EnhancedEarth } from "@/components/3d/EnhancedEarth";
 import { Planet } from "@/components/3d/Planet";
 import { Constellations } from "@/components/3d/Constellations";
@@ -12,8 +12,7 @@ import { AsteroidBelt } from "@/components/3d/AsteroidBelt";
 import { EffectComposer, Bloom, GodRays } from "@react-three/postprocessing";
 import { BlendFunction, KernelSize } from "postprocessing";
 import { GameControls } from "@/components/3d/GameControls";
-import { DefenseHUD } from "@/components/ui/DefenseHUD";
-import { AsteroidField } from "@/components/3d/AsteroidField";
+
 import React, { useState } from "react";
 import * as THREE from "three";
 import { SpaceshipControls } from "@/components/3d/SpaceshipControls";
@@ -51,7 +50,7 @@ export default function Home() {
         <EnhancedEarth />
         <Constellations />
         <AsteroidBelt />
-        <Comet />
+
 
         {planets.filter(p => p.name !== "Earth").map((planet, index) => (
           <Planet key={index} planet={planet} />
@@ -78,12 +77,12 @@ export default function Home() {
         <GameControls />
         <SpaceshipControls />
         <SpaceshipInteraction />
-        <AsteroidField />
+
       </Canvas>
       
       <Crosshair />
       <HUD />
-      <DefenseHUD />
+
       <PlanetDetails />
       <Navigation />
       <ModeToggle />
